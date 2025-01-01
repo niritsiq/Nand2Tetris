@@ -1,0 +1,160 @@
+/** Represents a Fish in the game */
+class Fish {
+    // Fields
+    field int x, y;                // Position coordinates
+    field int screenWidth, screenHeight; // Screen dimensions
+    field int hitBoxSize;          // Hitbox for collision
+    field int fallDelay;           // Delay counter for falling speed
+    field int speed;               // Movement speed
+
+    /** Constructs a new Fish */
+    constructor Fish new(int initSpeed) {
+        let screenWidth = 511;
+        let screenHeight = 255;
+        let hitBoxSize = 15;
+        let fallDelay = 0;
+        let speed = initSpeed + 1;
+        let x = 0;
+        let y = 0;
+        do randomRespawn();
+        return this;
+    }
+
+    /** Disposes of this fish */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Draws the fish */
+    method void draw() {
+        do Screen.setColor(true);
+        do drawFish();
+        return;
+    }
+
+    /** Erases the fish */
+    method void erase() {
+        do Screen.setColor(false);
+        do drawFish();
+        return;
+    }
+
+    /** Randomly respawns the fish at the top of the screen */
+    method void randomRespawn() {
+        var int minX, maxX;
+        
+        // Ensure fish is erased from current position if valid
+        if ((x > 0) & (y > 0)) {
+            do erase();
+        }
+        
+        // Set safe boundaries for fish spawn
+        let minX = 30;
+        let maxX = screenWidth - 60;  // Leave more space on right edge
+        
+        // Generate random X position within safe boundaries
+        let x = Random.randRange(maxX - minX) + minX;
+        let y = 10;  // Start slightly below top to ensure safe drawing
+        let fallDelay = 0;
+        
+        do draw();
+        return;
+    }
+
+    /** Returns the fish's Y position */
+    method int getY() { return y; }
+    
+    /** Returns the fish's X position */
+    method int getX() { return x; }
+
+    /** Moves the fish down */
+    method void moveDown() {
+        let fallDelay = fallDelay + 1;
+
+        if (fallDelay > (4 - speed)) {
+            // Check if next move would hit bottom
+            if ((y + 15) > 236) {  // If fish would hit bottom line
+                return;  // Stop moving but don't erase - let game over check handle it
+            }
+            
+            // Only move if not hitting bottom
+            do erase();
+            let y = y + speed;
+            let fallDelay = 0;
+            do draw();
+        }
+        return;
+    }
+
+    /** Draws an elegant small fish */
+    method void drawFish() {
+        // Ensure x and y are within safe bounds before drawing
+        if ((x < 1) | (x > (screenWidth - 30)) | (y < 1) | (y > (screenHeight - 20))) {
+            return;  // Don't draw if coordinates are unsafe
+        }
+
+        // Main body - streamlined teardrop shape
+        do Screen.drawLine(x+5, y+7, x+15, y+7);    // Top line
+        do Screen.drawLine(x+15, y+7, x+20, y+10);  // Upper curve
+        do Screen.drawLine(x+20, y+10, x+15, y+13); // Lower curve
+        do Screen.drawLine(x+15, y+13, x+5, y+13);  // Bottom line
+        do Screen.drawLine(x+5, y+7, x+2, y+10);    // Head upper curve
+        do Screen.drawLine(x+2, y+10, x+5, y+13);   // Head lower curve
+        
+        // Tail - simple and elegant
+        do Screen.drawLine(x+20, y+10, x+25, y+7);  // Upper tail
+        do Screen.drawLine(x+25, y+7, x+25, y+13);  // Tail end
+        do Screen.drawLine(x+25, y+13, x+20, y+10); // Lower tail
+        
+        // Dorsal fin - small and pointed
+        do Screen.drawLine(x+12, y+7, x+15, y+5);
+        do Screen.drawLine(x+15, y+5, x+17, y+7);
+        
+        // Eye - single dot
+        do Screen.drawPixel(x+4, y+9);
+        
+        // Pectoral fin - small and subtle
+        do Screen.drawLine(x+7, y+13, x+9, y+14);
+        do Screen.drawLine(x+9, y+14, x+10, y+13);
+        
+        return;
+    }
+
+    /** Checks if the fish has been caught by a cat */
+    method boolean isCaught(int catX, int catY) {
+        var int fishRight, fishBottom, catRight, catBottom;
+        var int fishLeft, fishTop, catLeft, catTop;
+        
+        // Fish hitbox - more precise coordinates
+        let fishLeft = x + 2;      // Start from fish head
+        let fishRight = x + 20;    // End at fish tail
+        let fishTop = y + 5;       // Top of fish body
+        let fishBottom = y + 13;   // Bottom of fish body
+        
+        // Cat hitbox - more precise coordinates
+        let catLeft = catX + 5;    // Left side of cat body
+        let catRight = catX + 25;  // Right side of cat body
+        let catTop = catY + 5;     // Top of cat body
+        let catBottom = catY + 20; // Bottom of cat body
+
+        // Check for overlap between cat and fish
+        if ((fishLeft < catRight) & 
+            (fishRight > catLeft) & 
+            (fishTop < catBottom) & 
+            (fishBottom > catTop)) {
+            do erase();  // Erase the fish immediately when caught
+            return true;
+        }
+        return false;
+    }
+
+    /** Returns true if fish has hit the bottom line */
+    method boolean hasHitBottom() {
+        // Check if fish has reached the bottom line
+        if ((y + 15) > 236) {  // Fish height is 15 pixels
+            return true;  // Game over condition
+        }
+        return false;
+    }
+}

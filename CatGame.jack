@@ -1,0 +1,498 @@
+class CatGame {
+    field Cat cat1, cat2;  // Two cats for two players
+    field Fish fish1, fish2, fish3;
+    field boolean fish2Active, fish3Active;
+    field int direction1, direction2;  // Directions for both players
+    field int score1, score2;  // Separate scores
+    field boolean exit;
+    field int bottomLine;
+    field boolean isTwoPlayerMode;  // Add this field at the top of the class
+
+    /** Shows the instruction screen and gets player count */
+    method void showInstructions() {
+        var char key;
+        
+        do Screen.clearScreen();
+        
+        // Title - centered
+        do Output.moveCursor(2, 20);
+        do Output.printString("*** CAT FISH GAME ***");
+        
+        // Player selection - centered
+        do Output.moveCursor(5, 15);
+        do Output.printString("How many players? (1 or 2)");
+        
+        // Wait for player count selection
+        while (true) {
+            let key = Keyboard.keyPressed();
+            if (key = 49) {  // '1' key
+                let isTwoPlayerMode = false;
+                do showGameInstructions();
+                return;
+            }
+            if (key = 50) {  // '2' key
+                let isTwoPlayerMode = true;
+                do showGameInstructions();
+                return;
+            }
+            do Sys.wait(50);
+        }
+        return;
+    }
+
+    /** Shows game instructions based on player count */
+    method void showGameInstructions() {
+        var char key;
+        
+        do Screen.clearScreen();
+        
+        // Title
+        do Output.moveCursor(2, 20);
+        do Output.printString("*** CAT FISH GAME ***");
+        
+        // Main instructions
+        do Output.moveCursor(4, 8);
+        do Output.printString("Welcome to Cat Fish Game!");
+        do Output.moveCursor(5, 8);
+        do Output.printString("Guide your cat to catch fish while preventing them");
+        do Output.moveCursor(6, 8);
+        do Output.printString("from reaching the bottom line.");
+        
+        // Controls section
+        do Output.moveCursor(8, 8);
+        do Output.printString("CONTROLS:");
+
+        if (isTwoPlayerMode) {
+            // Player 1 controls
+            do Output.moveCursor(10, 8);
+            do Output.printString("Player 1 (Arrow Keys):");
+            do Output.moveCursor(11, 8);
+            do Output.printString("^ - Move up    v - Move down");
+            do Output.moveCursor(12, 8);
+            do Output.printString("< - Move left  > - Move right");
+            
+            // Player 2 controls - with space between players
+            do Output.moveCursor(14, 8);  // Added gap
+            do Output.printString("Player 2 (WASD):");
+            do Output.moveCursor(15, 8);
+            do Output.printString("W - Move up    S - Move down");
+            do Output.moveCursor(16, 8);
+            do Output.printString("A - Move left  D - Move right");
+
+            // Game Features - moved down after controls
+            do Output.moveCursor(18, 8);  // Moved down
+            do Output.printString("GAME FEATURES:");
+            do Output.moveCursor(19, 8);
+            do Output.printString("* New fish appears at score 5 and 10");
+            do Output.moveCursor(20, 8);
+            do Output.printString("* Cat speed increases every 5 points");
+            do Output.moveCursor(21, 8);
+            do Output.printString("* Press P to pause, R to restart, Q to quit");
+        } else {
+            // Single player controls
+            do Output.moveCursor(10, 8);
+            do Output.printString("^ UP ARROW    - Move cat up");
+            do Output.moveCursor(11, 8);
+            do Output.printString("v DOWN ARROW  - Move cat down");
+            do Output.moveCursor(12, 8);
+            do Output.printString("< LEFT ARROW  - Move cat left");
+            do Output.moveCursor(13, 8);
+            do Output.printString("> RIGHT ARROW - Move cat right");
+
+            // Game Features
+            do Output.moveCursor(15, 8);
+            do Output.printString("GAME FEATURES:");
+            do Output.moveCursor(16, 8);
+            do Output.printString("* New fish appears at score 5 and 10");
+            do Output.moveCursor(17, 8);
+            do Output.printString("* Cat speed increases every 5 points");
+            do Output.moveCursor(18, 8);
+            do Output.printString("* Press P to pause, R to restart, Q to quit");
+        }
+
+        // Start prompt - at the bottom
+        do Output.moveCursor(22, 20);
+        do Output.printString("Press S to start!");
+        
+        // Wait for S/s key
+        while (true) {
+            let key = Keyboard.keyPressed();
+            if ((key = 83) | (key = 115)) {  // 'S' or 's'
+                do Screen.clearScreen();
+                return;
+            }
+            do Sys.wait(50);
+        }
+        return;
+    }
+
+    /** Constructor with instruction screen */
+    constructor CatGame new() {
+        var char key;
+        
+        do showInstructions();
+        
+        do Screen.clearScreen();
+        let cat1 = Cat.new(80, 60, false);
+        if (isTwoPlayerMode) {
+            let cat2 = Cat.new(400, 60, true);
+        }
+        
+        // Start with only one fish
+        let fish1 = Fish.new(1);  // Create only the first fish
+        let fish2Active = false;
+        let fish3Active = false;
+        
+        // Initialize other variables
+        let direction1 = 0;
+        let direction2 = 0;
+        let score1 = 0;
+        let score2 = 0;
+        let exit = false;
+        let bottomLine = 238;
+        
+        // Draw initial screen
+        do Screen.drawRectangle(0, bottomLine, 511, bottomLine + 2);
+        do Output.moveCursor(22,0);
+        if (isTwoPlayerMode) {
+            do Output.printString("P1: 0");
+            do Output.moveCursor(22,40);
+            do Output.printString("P2: 0");
+        } else {
+            do Output.printString("Score: 0");
+        }
+        return this;
+    }
+
+    /** Reset game with instruction option */
+    method void resetGame() {
+        var char key;
+        
+        do Screen.clearScreen();
+        do Output.moveCursor(10,20);
+        do Output.printString("Show instructions? (Y/N)");
+        
+        // Wait for Y/y or N/n
+        while (true) {
+            let key = Keyboard.keyPressed();
+            if ((key = 89) | (key = 121)) {  // 'Y' or 'y'
+                do showInstructions();
+                return initializeGame();
+            }
+            if ((key = 78) | (key = 110)) {  // 'N' or 'n'
+                return initializeGame();
+            }
+            do Sys.wait(50);
+        }
+        return;
+    }
+
+    /** Initialize game state */
+    method void initializeGame() {
+        do Screen.clearScreen();
+        
+        // Reset cats based on game mode
+        do cat1.dispose();
+        if (isTwoPlayerMode) {
+            do cat2.dispose();
+        }
+        
+        let cat1 = Cat.new(80, 60, false);
+        if (isTwoPlayerMode) {
+            let cat2 = Cat.new(400, 60, true);
+        }
+        
+        // Start with only one fish
+        if (~(fish1 = null)) { do fish1.dispose(); }
+        if (~(fish2 = null)) { do fish2.dispose(); }
+        if (~(fish3 = null)) { do fish3.dispose(); }
+        
+        let fish1 = Fish.new(1);  // Create only the first fish
+        let fish2 = null;
+        let fish3 = null;
+        let fish2Active = false;
+        let fish3Active = false;
+        
+        // Reset game state
+        let direction1 = 0;
+        let direction2 = 0;
+        let score1 = 0;
+        let score2 = 0;
+        let exit = false;
+        
+        // Redraw initial screen
+        do Screen.drawRectangle(0, bottomLine, 511, bottomLine + 2);
+        do Output.moveCursor(22,0);
+        if (isTwoPlayerMode) {
+            do Output.printString("P1: 0");
+            do Output.moveCursor(22,40);
+            do Output.printString("P2: 0");
+        } else {
+            do Output.printString("Score: 0");
+        }
+        return;
+    }
+
+    method void dispose() {
+        do cat1.dispose();
+        do cat2.dispose();
+        do fish1.dispose();
+        do fish2.dispose();
+        do fish3.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void checkScoreAndActivateFish() {
+        var int totalScore;
+        
+        if (isTwoPlayerMode) {
+            let totalScore = score1 + score2;  // Combined score for 2 players
+        } else {
+            let totalScore = score1;  // Single player score
+        }
+
+        // Activate second fish at combined score 5 with medium speed
+        if ((~fish2Active) & (totalScore > 4)) {
+            let fish2Active = true;
+            let fish2 = Fish.new(2);  // Medium speed
+            do fish2.randomRespawn();
+        }
+        
+        // Activate third fish at combined score 10 with fast speed
+        if ((~fish3Active) & (totalScore > 9)) {
+            let fish3Active = true;
+            let fish3 = Fish.new(3);  // Fast speed
+            do fish3.randomRespawn();
+        }
+
+        // Keep the cat speed increase logic
+        if ((score1 > 0) & ((score1 - ((score1/5)*5)) = 0)) {
+            do cat1.increaseSpeed();
+            if (isTwoPlayerMode) {
+                do cat2.increaseSpeed();
+            }
+        }
+        if (isTwoPlayerMode & (score2 > 0) & ((score2 - ((score2/5)*5)) = 0)) {
+            do cat2.increaseSpeed();
+        }
+        return;
+    }
+
+    method void moveCats() {
+        // Player 1 movement
+        if (direction1 = 1) { do cat1.moveUp(); }
+        if (direction1 = 2) { do cat1.moveRight(); }
+        if (direction1 = 3) { do cat1.moveLeft(); }
+        if (direction1 = 4) { do cat1.moveDown(); }
+
+        // Player 2 movement (only in two-player mode)
+        if (isTwoPlayerMode) {
+            if (direction2 = 1) { do cat2.moveUp(); }
+            if (direction2 = 2) { do cat2.moveRight(); }
+            if (direction2 = 3) { do cat2.moveLeft(); }
+            if (direction2 = 4) { do cat2.moveDown(); }
+        }
+
+        // Check fish collisions for player 1
+        if (fish1.isCaught(cat1.getX(), cat1.getY())) {
+            let score1 = score1 + 1;
+            do fish1.randomRespawn();
+            do updateScore(1);
+        }
+
+        // Similar for fish2 and fish3
+        if (fish2Active & fish2.isCaught(cat1.getX(), cat1.getY())) {
+            let score1 = score1 + 1;
+            do fish2.randomRespawn();
+            do updateScore(1);
+        }
+
+        // Only check player 2 collisions in two-player mode
+        if (isTwoPlayerMode) {
+            // Check all fish collisions for player 2
+            if (fish1.isCaught(cat2.getX(), cat2.getY())) {
+                let score2 = score2 + 1;
+                do fish1.randomRespawn();
+                do updateScore(2);
+            }
+
+            // Add checks for fish2 and fish3 for player 2
+            if (fish2Active & fish2.isCaught(cat2.getX(), cat2.getY())) {
+                let score2 = score2 + 1;
+                do fish2.randomRespawn();
+                do updateScore(2);
+            }
+
+            if (fish3Active & fish3.isCaught(cat2.getX(), cat2.getY())) {
+                let score2 = score2 + 1;
+                do fish3.randomRespawn();
+                do updateScore(2);
+            }
+        }
+
+        // Add this missing check for fish3 with player 1
+        if (fish3Active & fish3.isCaught(cat1.getX(), cat1.getY())) {
+            let score1 = score1 + 1;
+            do fish3.randomRespawn();
+            do updateScore(1);
+        }
+
+        return;
+    }
+
+    method void updateScore(int player) {
+        if (isTwoPlayerMode) {
+            if (player = 1) {
+                do Output.moveCursor(22,0);  // Bottom left
+                do Output.printString("P1: ");
+                do Output.printInt(score1);
+            } else {
+                do Output.moveCursor(22,40);  // Bottom right
+                do Output.printString("P2: ");
+                do Output.printInt(score2);
+            }
+        } else {
+            do Output.moveCursor(22,0);  // Bottom left
+            do Output.printString("Score: ");
+            do Output.printInt(score1);
+        }
+        do checkScoreAndActivateFish();
+        return;
+    }
+
+    method void checkFishCollision() {
+        // Check all fish for bottom line collision
+        if (fish1.hasHitBottom()) {
+            let exit = true;
+            return;
+        }
+
+        if (fish2Active) {  // Only check if fish2 is active
+            if (fish2.hasHitBottom()) {
+                let exit = true;
+                return;
+            }
+        }
+
+        if (fish3Active) {  // Only check if fish3 is active
+            if (fish3.hasHitBottom()) {
+                let exit = true;
+                return;
+            }
+        }
+        return;
+    }
+
+    method void run() {
+        var char key;
+        var char lastKey;
+        var boolean gameRunning;
+        var boolean isPaused;
+        
+        let gameRunning = true;
+        let isPaused = false;
+        while (gameRunning) {
+            let exit = false;
+            
+            while (~exit) {
+                let key = Keyboard.keyPressed();
+                
+                // Handle pause toggle
+                if ((~(key = lastKey)) & ((key = 80) | (key = 112))) {  // 'P' or 'p'
+                    let isPaused = ~isPaused;
+                    if (isPaused) {
+                        do Output.moveCursor(10,20);
+                        do Output.printString("PAUSED");
+                        do Output.moveCursor(11,20);
+                        do Output.printString("Press P to continue");
+                        do Output.moveCursor(12,20);
+                        do Output.printString("Press R to restart");
+                    } else {
+                        // Clear entire screen and redraw everything
+                        do Screen.clearScreen();
+                        // Redraw bottom line
+                        do Screen.drawRectangle(0, bottomLine, 511, bottomLine + 2);
+                        // Redraw cats and fish
+                        do cat1.draw();
+                        if (isTwoPlayerMode) {
+                            do cat2.draw();
+                        }
+                        do fish1.draw();
+                        if (fish2Active) { do fish2.draw(); }
+                        if (fish3Active) { do fish3.draw(); }
+                        // Redraw score
+                        do updateScore(1);
+                        if (isTwoPlayerMode) {
+                            do updateScore(2);
+                        }
+                    }
+                }
+
+                if (isPaused) {
+                    // Check for restart while paused
+                    if ((key = 82) | (key = 114)) {  // 'R' or 'r'
+                        do resetGame();
+                        let lastKey = 0;
+                        return run();
+                    }
+                } else {
+                    // Game controls
+                    if ((key = 81) | (key = 113)) { let exit = true; }  // 'Q' or 'q'
+                    
+                    // Player 1 controls (arrow keys)
+                    if (key = 131) { let direction1 = 1; }   // up
+                    if (key = 132) { let direction1 = 2; }   // right
+                    if (key = 130) { let direction1 = 3; }   // left
+                    if (key = 133) { let direction1 = 4; }   // down
+
+                    if (isTwoPlayerMode) {
+                        // Player 2 controls (WASD)
+                        if ((key = 87) | (key = 119)) { let direction2 = 1; }   // W/w
+                        if ((key = 68) | (key = 100)) { let direction2 = 2; }   // D/d
+                        if ((key = 65) | (key = 97)) { let direction2 = 3; }    // A/a
+                        if ((key = 83) | (key = 115)) { let direction2 = 4; }   // S/s
+                    }
+
+                    if (key = 0) { 
+                        let direction1 = 0;
+                        let direction2 = 0;
+                    }
+
+                    // Update game state
+                    do moveCats();
+                    do fish1.moveDown();
+                    if (fish2Active) { do fish2.moveDown(); }
+                    if (fish3Active) { do fish3.moveDown(); }
+                    
+                    do checkFishCollision();
+                }
+                
+                let lastKey = key;
+                do Sys.wait(50);
+            }
+
+            // Game Over screen
+            do Output.moveCursor(10,20);
+            do Output.printString("Game Over");
+            do Output.moveCursor(11,20);
+            do Output.printString("Press R to restart or Q to quit");
+            
+            // Wait for R/r or Q/q key
+            while (true) {
+                let key = Keyboard.keyPressed();
+                if ((key = 82) | (key = 114)) {  // 'R' or 'r'
+                    do resetGame();
+                    let lastKey = 0;
+                    return run();
+                }
+                if ((key = 81) | (key = 113)) {  // 'Q' or 'q'
+                    let gameRunning = false;
+                    return;
+                }
+                do Sys.wait(50);
+            }
+        }
+        return;
+    }
+}

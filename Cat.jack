@@ -1,0 +1,140 @@
+class Cat {
+    field int x, y;    
+    field int size;    
+    field int screenWidth, screenHeight;
+    field int speed;
+    field boolean isSecondPlayer;  // To differentiate between cats
+
+    constructor Cat new(int ax, int ay, boolean secondPlayer) {
+        let x = ax;
+        let y = ay;
+        let size = 30;
+        let screenWidth = 511;
+        let screenHeight = 255;
+        let speed = 4;
+        let isSecondPlayer = secondPlayer;
+        do draw();
+        return this;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void draw() {
+        do drawCat(true);
+        return;
+    }
+
+    method void erase() {
+        do drawCat(false);
+        return;
+    }
+
+    method void moveUp() {
+        if ((y - 6) > 8) {
+            do erase();
+            let y = y - speed;
+            do draw();
+        }
+        return;
+    }
+
+    method void moveDown() {
+        if ((y + size + 4) < 238) {  // Stop before hitting the bottom line
+            do erase();
+            let y = y + speed;
+            do draw();
+        }
+        return;
+    }
+
+    method void moveLeft() {
+        if ((x - 6) > 1) {
+            do erase();
+            let x = x - speed;
+            do draw();
+        }
+        return;
+    }
+
+    method void moveRight() {
+        if ((x + size + 6) < screenWidth) {
+            do erase();
+            let x = x + speed;
+            do draw();
+        }
+        return;
+    }
+
+    method int getX() { return x; }
+    method int getY() { return y; }
+
+    /** Draws a detailed cat */
+    method void drawCat(boolean color) {
+        // First check if we're too close to the bottom line
+        if ((y + 25) > 238) {
+            let y = 238 - 25;
+        }
+
+        do Screen.setColor(color);
+
+        if (isSecondPlayer) {
+            // For player 2, draw outline and face
+            do Screen.drawLine(x, y, x+30, y);   // Top side
+            do Screen.drawLine(x, y, x, y+25);   // Left side
+            do Screen.drawLine(x+30, y, x+30, y+25); // Right side
+            do Screen.drawLine(x, y+25, x+30, y+25); // Bottom side
+            
+            // Draw ears
+            if (y > 7) {
+                do Screen.drawLine(x+5, y, x+8, y-8);
+                do Screen.drawLine(x+8, y-8, x+11, y);
+                do Screen.drawLine(x+19, y, x+22, y-8);
+                do Screen.drawLine(x+22, y-8, x+25, y);
+            }
+
+            // Draw simple face for player 2
+            do Screen.drawLine(x+7, y+8, x+12, y+8);  // Left eye
+            do Screen.drawLine(x+18, y+8, x+23, y+8); // Right eye
+            do Screen.drawLine(x+14, y+13, x+16, y+13); // Nose
+            do Screen.drawLine(x+15, y+14, x+15, y+17); // Mouth
+        } else {
+            // Player 1's cat with all details
+            do Screen.drawLine(x, y, x+30, y);   // Top side
+            do Screen.drawLine(x, y, x, y+25);   // Left side
+            do Screen.drawLine(x+30, y, x+30, y+25); // Right side
+            do Screen.drawLine(x, y+25, x+30, y+25); // Bottom side
+
+            if (y > 7) {
+                // Left ear
+                do Screen.drawLine(x+5, y, x+8, y-8);
+                do Screen.drawLine(x+8, y-8, x+11, y);
+                // Right ear
+                do Screen.drawLine(x+19, y, x+22, y-8);
+                do Screen.drawLine(x+22, y-8, x+25, y);
+            }
+
+            // Draw eyes
+            do Screen.drawRectangle(x+7, y+7, x+12, y+10);
+            do Screen.drawRectangle(x+18, y+7, x+23, y+10);
+
+            // Draw nose
+            do Screen.drawRectangle(x+14, y+12, x+16, y+14);
+
+            // Draw mouth
+            do Screen.drawLine(x+15, y+14, x+15, y+17);
+
+            // Draw whiskers
+            do Screen.drawLine(x+5, y+14, x, y+12);
+            do Screen.drawLine(x+25, y+14, x+30, y+12);
+        }
+        return;
+    }
+
+    method void increaseSpeed() {
+        let speed = speed + 1;  // Increase speed by 1 unit
+        return;
+    }
+}

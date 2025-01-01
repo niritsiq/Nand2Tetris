@@ -1,0 +1,34 @@
+/** Random Number Generator */
+class Random {
+    static int seed;
+    
+    /** Sets a new random seed */
+    function void setSeed(int newSeed) {
+        let seed = newSeed;
+        return;
+    }
+
+    /** Generates a random number in the range 0–32767 */
+    function int rand() {
+        let seed = seed + 20251;
+        if (seed < 0) {
+            let seed = seed - 32767 - 1;
+        }
+        return seed;
+    }
+
+    /** Generates a random number in the range 0..range */
+    function int randRange(int range) {
+        var int mask;
+        var int ret;
+        let mask = 1;
+        while (mask < range) {
+            let mask = mask * 2 + 1;
+        }
+        let ret = Random.rand() & mask;
+        while (ret > range) {
+            let ret = Random.rand() & mask;
+        }
+        return ret;
+    }
+}

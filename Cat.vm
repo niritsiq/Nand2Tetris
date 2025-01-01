@@ -1,0 +1,531 @@
+function Cat.new 0
+    push constant 7
+    call Memory.alloc 1
+    pop pointer 0
+    push argument 0
+    pop this 0
+    push argument 1
+    pop this 1
+    push constant 30
+    pop this 2
+    push constant 511
+    pop this 3
+    push constant 255
+    pop this 4
+    push constant 4
+    pop this 5
+    push argument 2
+    pop this 6
+    push pointer 0
+    call Cat.draw 1
+    pop temp 0
+    push pointer 0
+    return
+function Cat.dispose 0
+    push argument 0
+    pop pointer 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return
+function Cat.draw 0
+    push argument 0
+    pop pointer 0
+    push pointer 0
+    push constant 1
+    neg
+    call Cat.drawCat 2
+    pop temp 0
+    push constant 0
+    return
+function Cat.erase 0
+    push argument 0
+    pop pointer 0
+    push pointer 0
+    push constant 0
+    call Cat.drawCat 2
+    pop temp 0
+    push constant 0
+    return
+function Cat.moveUp 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    push constant 6
+    sub
+    push constant 8
+    gt
+    not
+    if-goto Cat_1
+    push pointer 0
+    call Cat.erase 1
+    pop temp 0
+    push this 1
+    push this 5
+    sub
+    pop this 1
+    push pointer 0
+    call Cat.draw 1
+    pop temp 0
+    goto Cat_0
+label Cat_1
+label Cat_0
+    push constant 0
+    return
+function Cat.moveDown 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    push this 2
+    add
+    push constant 4
+    add
+    push constant 238
+    lt
+    not
+    if-goto Cat_3
+    push pointer 0
+    call Cat.erase 1
+    pop temp 0
+    push this 1
+    push this 5
+    add
+    pop this 1
+    push pointer 0
+    call Cat.draw 1
+    pop temp 0
+    goto Cat_2
+label Cat_3
+label Cat_2
+    push constant 0
+    return
+function Cat.moveLeft 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    push constant 6
+    sub
+    push constant 1
+    gt
+    not
+    if-goto Cat_5
+    push pointer 0
+    call Cat.erase 1
+    pop temp 0
+    push this 0
+    push this 5
+    sub
+    pop this 0
+    push pointer 0
+    call Cat.draw 1
+    pop temp 0
+    goto Cat_4
+label Cat_5
+label Cat_4
+    push constant 0
+    return
+function Cat.moveRight 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    push this 2
+    add
+    push constant 6
+    add
+    push this 3
+    lt
+    not
+    if-goto Cat_7
+    push pointer 0
+    call Cat.erase 1
+    pop temp 0
+    push this 0
+    push this 5
+    add
+    pop this 0
+    push pointer 0
+    call Cat.draw 1
+    pop temp 0
+    goto Cat_6
+label Cat_7
+label Cat_6
+    push constant 0
+    return
+function Cat.getX 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    return
+function Cat.getY 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    return
+function Cat.drawCat 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    push constant 25
+    add
+    push constant 238
+    gt
+    not
+    if-goto Cat_9
+    push constant 238
+    push constant 25
+    sub
+    pop this 1
+    goto Cat_8
+label Cat_9
+label Cat_8
+    push argument 1
+    call Screen.setColor 1
+    pop temp 0
+    push this 6
+    not
+    if-goto Cat_11
+    push this 0
+    push this 1
+    push this 0
+    push constant 30
+    add
+    push this 1
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push this 1
+    push this 0
+    push this 1
+    push constant 25
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 30
+    add
+    push this 1
+    push this 0
+    push constant 30
+    add
+    push this 1
+    push constant 25
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push this 1
+    push constant 25
+    add
+    push this 0
+    push constant 30
+    add
+    push this 1
+    push constant 25
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push this 1
+    push constant 7
+    gt
+    not
+    if-goto Cat_13
+    push this 0
+    push constant 5
+    add
+    push this 1
+    push this 0
+    push constant 8
+    add
+    push this 1
+    push constant 8
+    sub
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 8
+    add
+    push this 1
+    push constant 8
+    sub
+    push this 0
+    push constant 11
+    add
+    push this 1
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 19
+    add
+    push this 1
+    push this 0
+    push constant 22
+    add
+    push this 1
+    push constant 8
+    sub
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 22
+    add
+    push this 1
+    push constant 8
+    sub
+    push this 0
+    push constant 25
+    add
+    push this 1
+    call Screen.drawLine 4
+    pop temp 0
+    goto Cat_12
+label Cat_13
+label Cat_12
+    push this 0
+    push constant 7
+    add
+    push this 1
+    push constant 8
+    add
+    push this 0
+    push constant 12
+    add
+    push this 1
+    push constant 8
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 18
+    add
+    push this 1
+    push constant 8
+    add
+    push this 0
+    push constant 23
+    add
+    push this 1
+    push constant 8
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 14
+    add
+    push this 1
+    push constant 13
+    add
+    push this 0
+    push constant 16
+    add
+    push this 1
+    push constant 13
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 15
+    add
+    push this 1
+    push constant 14
+    add
+    push this 0
+    push constant 15
+    add
+    push this 1
+    push constant 17
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    goto Cat_10
+label Cat_11
+    push this 0
+    push this 1
+    push this 0
+    push constant 30
+    add
+    push this 1
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push this 1
+    push this 0
+    push this 1
+    push constant 25
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 30
+    add
+    push this 1
+    push this 0
+    push constant 30
+    add
+    push this 1
+    push constant 25
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push this 1
+    push constant 25
+    add
+    push this 0
+    push constant 30
+    add
+    push this 1
+    push constant 25
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push this 1
+    push constant 7
+    gt
+    not
+    if-goto Cat_15
+    push this 0
+    push constant 5
+    add
+    push this 1
+    push this 0
+    push constant 8
+    add
+    push this 1
+    push constant 8
+    sub
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 8
+    add
+    push this 1
+    push constant 8
+    sub
+    push this 0
+    push constant 11
+    add
+    push this 1
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 19
+    add
+    push this 1
+    push this 0
+    push constant 22
+    add
+    push this 1
+    push constant 8
+    sub
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 22
+    add
+    push this 1
+    push constant 8
+    sub
+    push this 0
+    push constant 25
+    add
+    push this 1
+    call Screen.drawLine 4
+    pop temp 0
+    goto Cat_14
+label Cat_15
+label Cat_14
+    push this 0
+    push constant 7
+    add
+    push this 1
+    push constant 7
+    add
+    push this 0
+    push constant 12
+    add
+    push this 1
+    push constant 10
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push this 0
+    push constant 18
+    add
+    push this 1
+    push constant 7
+    add
+    push this 0
+    push constant 23
+    add
+    push this 1
+    push constant 10
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push this 0
+    push constant 14
+    add
+    push this 1
+    push constant 12
+    add
+    push this 0
+    push constant 16
+    add
+    push this 1
+    push constant 14
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push this 0
+    push constant 15
+    add
+    push this 1
+    push constant 14
+    add
+    push this 0
+    push constant 15
+    add
+    push this 1
+    push constant 17
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 5
+    add
+    push this 1
+    push constant 14
+    add
+    push this 0
+    push this 1
+    push constant 12
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 25
+    add
+    push this 1
+    push constant 14
+    add
+    push this 0
+    push constant 30
+    add
+    push this 1
+    push constant 12
+    add
+    call Screen.drawLine 4
+    pop temp 0
+label Cat_10
+    push constant 0
+    return
+function Cat.increaseSpeed 0
+    push argument 0
+    pop pointer 0
+    push this 5
+    push constant 1
+    add
+    pop this 5
+    push constant 0
+    return
